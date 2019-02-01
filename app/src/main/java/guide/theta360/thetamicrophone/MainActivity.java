@@ -15,7 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.theta360.pluginapplication.R;
+import guide.theta360.pluginapplication.R;
 import com.theta360.pluginlibrary.activity.PluginActivity;
 import com.theta360.pluginlibrary.callback.KeyCallback;
 import com.theta360.pluginlibrary.receiver.KeyReceiver;
