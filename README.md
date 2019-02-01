@@ -1,130 +1,133 @@
-# RICOH THETA Microphone Plug-in
+# RICOH THETA Plug-in SDK
 
-This project and article was [originally published in Qiita](https://qiita.com/kushimoto/items/e2ee2b1abd05dc50ffcf) by [Mr. Kushimoto](https://qiita.com/kushimoto) or Ricoh.
+Version: 1.0.1
 
-I edited the article and deleted some of the references to Japanese documents that we don&rsquo;t have in English.
+## Contents
 
-2018/10/09 Addendum: I confirmed that I can connect the speaker to THETA and play it at high volume! [Editor note: see [related article](https://community.theta360.guide/t/how-to-connect-a-speaker-to-ricoh-theta-with-usb-otg-to-get-good-sound-volume-from-camera/3732?u=codetricity)]
+* [Terms of Service](#terms)
+* [Files included in the archive](#files)
+* [Technical requirements for development](#requirements)
+* [Contents of the SDK](#contents)
+* [Getting Started](#started)
+* [Where to find the latest information](#information)
+* [Troubleshooting](#troubleshooting)
+* [Trademark Information](#trademark)
 
-Since the RICOH THETA V is an Android-based device, it can be expanded by installing an application. For the RICOH THETA, the application is called a plug-in.
+<a name="terms"></a>
+## Terms of Service
 
-In this article, I will show you how to record using the microphone with the THETA plug-in.
+> You agree to comply with all applicable export and import laws and regulations applicable to the jurisdiction in which the Software was obtained and in which it is used. Without limiting the foregoing, in connection with use of the Software, you shall not export or re-export the Software  into any U.S. embargoed countries (currently including, but necessarily limited to, Crimea – Region of Ukraine, Cuba, Iran, North Korea, Sudan and Syria) or  to anyone on the U.S. Treasury Department’s list of Specially Designated Nationals or the U.S. Department of Commerce Denied Person’s List or Entity List.  By using the Software, you represent and warrant that you are not located in any such country or on any such list.  You also agree that you will not use the Software for any purposes prohibited by any applicable laws, including, without limitation, the development, design, manufacture or production of missiles, nuclear, chemical or biological weapons.
 
-point
+By using the RICOH THETA Plug-in SDK, you are agreeing to the above and the license terms, [LICENSE.txt](LICENSE.txt).
 
-The points are as follows.
+Copyright &copy; 2018 Ricoh Company, Ltd.
 
-* Set to record in monaural
-* Add permission to change audio settings
+<a name="files"></a>
+## Files included in the archive
 
-## 1. Set to record in monaural
+```
+├── README.md:            This file
+├── LICENSE.txt:          Files concerning the contract
+├── app:                  Sample project
+├── build.gradle:         Android Studio build script
+├── gradle:               Android Studio build script
+├── gradle.properties:    Android Studio build script
+├── gradlew:              Android Studio build script
+├── gradlew.bat:          Android Studio build script
+├── pluginlibrary:        Plug-in library (utility program)
+└── settings.gradle:      Android Studio build script
+```
 
-THETA V is capable of recording 360 ° spatial sound by 4ch microphone.
+<a name="requirements"></a>
+## Technical requirements for development
 
-When shooting movies using the Web API, you can acquire videos with spatial sounds, and you can also capture wav files of spatial sounds when shooting movies using the Camera API (For the Camera API, It is planned to be).
+The SDK was tested with a RICOH THETA V under the following conditions.
 
-However, when using the standard Android API, it is not compatible with 360 ° spatial audio, so it is necessary to record in monaural.
+### Camera
 
-THETA V adds some parameters to the [AudioManager](https://developer.android.com/reference/android/media/AudioManager) API.
+#### Hardware
 
-By using the **B-format Selection** parameter, you can set to record in mono.
+* RICOH THETA V
 
-To set it to monaural, pass `RicUseBFormat = false`  to `setParameters ()` of `AudioManager` before using the microphone as below.
+#### Firmware
 
-    AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-    audioManager.setParameters("RicUseBFormat=false");
+* ver.2.30.1 and above
 
-## 2. Add authority to change audio settings
+    > Information on checking and updating the firmware is [here](https://theta360.com/en/support/manual/v/content/pc/pc_09.html).
 
-Since you change the audio setting using AudioManager as shown in 1, add the following authority to AndroidManifest.xml (RECORD_AUDIO is also required as it is necessary).
+### Development Environment
 
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" /> 
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+This SDK has been confirmed to operate under the following conditions.
 
-## Sample code
+#### Operating System
 
-If you keep the above points, the rest is the same as general Android application development.
+* Windows 10 Version 1709
+* macOS High Sierra ver.10.13
 
-In this article, I tried to create a plugin to record using MediaRecorder as sample code.
+#### Development environment
 
-The source code is at the bottom of this article.
+* Android&trade; Studio 3.1+
+* gradle 3.1.4
+* Android&trade; SDK (API Level 25)
+* compileSdkVersion 26
+* buildToolsVersion "27.0.3"
+* minSdkVersion 25
+* targetSdkVersion 25
 
-Press the radio button to start recording, and press the wireless button again to end recording.
+<a name="contents"></a>
+## Contents of the SDK
 
-Recording sound can be played by pressing the shutter button.
+* This SDK is a Plug-in sample project of Android&trade; Studio.
+* This SDK implements the basic parts necessary for developing plug-ins. You can create your own development project based on this project.
+* This SDK includes a plug-in library ([pluginlibrary](pluginlibrary)) to support plug-in development of RICOH THETA. The plug-in library is the main part of the SDK, with its own part of the RICOH THETA plug-in being consolidated.
+* The plug-in library implements the following functions that a standard plug-in should implement.
+    * Get button operation event
+    * Plug-in termination processing
+    * LED control
+    * Control of speaker
 
-Although you can understand when you run the sample code, the volume to be played is fairly small.
+<a name="started"></a>
+## Getting Started
 
-This is because the THETA V speaker is designed only to reproduce the original operation sound.
+1. Import plug-in sdk as a project into Android&trade; Studio.
+1. Please rewrite the sample program in app accordingly and create a program.
 
-Although electronic sound can sound as it is, it is not strong for the recorded natural sound like this time, so please be careful when making plug-in with speaker.
+    * By inheriting `PluginActivity` you will be able to use library methods.
 
-It is like this when you move it.
+        ```java
+        public class MainActivity extends PluginActivity {
+            @Override
+            protected void onCreate (Bundle savedInstanceState) {
+                super.onCreate (savedInstanceState);
+                setContentView (R.layout.activity_main);
+        ```
 
-### Press the Wi-Fi button the side to start recording audio.
+    * Please refer to [the web SDK document](https://api.ricoh/docs/theta-plugin/) for development precautions.
 
-![image|623x500](docs/img/camera-01.jpg)
+1. Please connect RICOH THETA V with USB.
+1. By running it, installing and debuging is possible.
+1. To build for distribution, build *apk* with *Build APK (s)* in the Build menu.
 
-### Press the Wi-Fi button again to stop recording audio
+<a name="information"></a>
+## Where to find the latest information
 
-![image|587x467](docs/img/camera-02.jpg)
+* The latest information is published on [the WEB site](https://api.ricoh/docs/theta-plugin/).
+* The latest SDK is released on [the GitHub project](https://github.com/ricohapi/theta-plugin-sdk).
 
-### Playing Sound on THETA
+<a name="troubleshooting"></a>
+## Troubleshooting
 
-As the THETA speaker is not intended to replay natural sounds, the speaker volume is low.
+If you have a request, create an issue on [the GitHub project](https://github.com/ricohapi/theta-plugin-sdk/issues).
 
-![image|558x451](docs/img/camera-03.jpg)
+<a name="trademark"></a>
+## Trademark Information
 
-Although playing the sound on the THETA is soft, the sound file actually has the correct volume.
+The names of products and services described in this document are trademarks or registered trademarks of each company.
 
-### Transfer File to laptop
-
-Playing the sound file on a laptop shows that the sound file was successfully recorded with the correct volume.
-
-![image|690x283](docs/img/laptop.jpg) 
-
-### YouTube Video in Japanese
-
-The video below is in Japanese, but you can follow along with the screenshots I put above that are in English. The main part is to listen to the sound clip from the laptop.
-
-https://youtu.be/0ipgLlGikMM
-
-[Additional notes] I tried connecting a speaker to THETA
-
-When playing with THETA, the volume was small, so I tried connecting the speaker to THETA via USB OTG.
-
-See this article in English that describes Mr. Kushimoto's successful use of an external speaker with the THETA to achive good sound volume.
-
-https://community.theta360.guide/t/how-to-connect-a-speaker-to-ricoh-theta-with-usb-otg-to-get-good-sound-volume-from-camera/3732?u=codetricity
-
-(↓ is a link to YouTube in Japanese, but see the article above in English for the same information).
-
-https://youtu.be/eIyVM0iEQLY
-
-I was able to play with a loud volume!
-
-The equipment I used this time is ↓.
-
-* USB DAC (USB Audio Class 1.0)
-* USB OTG adapter (converted to micro B because USB DAC was Type A)
-* Analog speaker (Built-in amplifier and battery)
-
-In this experiment, you can play with the external speaker without changing the source code.
-
-In other words, you can use OTG compliant USB device as it is with THETA! I understood that.
-
-OTG USB support depends on the product. Some adapters will work and  some won't. Please experiment with each product!
-
-**Please be careful that we are not guaranteeing the operation with these equipment. Use this guide at your own responsibility**
-
-## Summary
-
-In this article, I showed you how to use a microphone with THETA.
-
-If you keep the point unique to THETA V, you can develop it like a general Android application, so if you are an Android developer, please feel free to try it.
-
-If you are interested in THETA plug-in development, please register with our [partner program](https://api.ricoh/products/theta-plugin/)!
-
-Please note that THETA serial number applied at the time of registration will not be subject to manufacturer support.
-
-![Analytics](https://ga-beacon.appspot.com/UA-73311422-5/theta-microphone)
+* Android, Nexus, Google Chrome, Google Play, Google Play logo, Google Maps, Google+, Gmail, Google Drive, Google Cloud Print and YouTube are trademarks of Google Inc.
+* Apple, Apple logo, Macintosh, Mac, Mac OS, OS X, AppleTalk, Apple TV, App Store, AirPrint, Bonjour, iPhone, iPad, iPad mini, iPad Air, iPod, iPod mini, iPod classic, iPod touch, iWork, Safari, the App Store logo, the AirPrint logo, Retina and iPad Pro are trademarks of Apple Inc., registered in the United States and other countries. The App Store is a service mark of Apple Inc.
+* Bluetooth Low Energy and Bluetooth are trademarks or registered trademarks of US Bluetooth SIG, INC., in the United States and other countries.
+* Microsoft, Windows, Windows Vista, Windows Live, Windows Media, Windows Server System, Windows Server, Excel, PowerPoint, Photosynth, SQL Server, Internet Explorer, Azure, Active Directory, OneDrive, Outlook, Wingdings, Hyper-V, Visual Basic, Visual C ++, Surface, SharePoint Server, Microsoft Edge, Active Directory, BitLocker, .NET Framework and Skype are registered trademarks or trademarks of Microsoft Corporation in the United States and other countries. The name of Skype, the trademarks and logos associated with it, and the "S" logo are trademarks of Skype or its affiliates.
+* Wi-Fi™, Wi-Fi Certified Miracast, Wi-Fi Certified logo, Wi-Fi Direct, Wi-Fi Protected Setup, WPA, WPA 2 and Miracast are trademarks of the Wi-Fi Alliance.
+* The official name of Windows is Microsoft Windows Operating System.
+* All other trademarks belong to their respective owners.
