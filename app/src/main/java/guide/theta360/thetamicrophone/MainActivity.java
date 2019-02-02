@@ -14,8 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-
-import guide.theta360.pluginapplication.R;
 import com.theta360.pluginlibrary.activity.PluginActivity;
 import com.theta360.pluginlibrary.callback.KeyCallback;
 import com.theta360.pluginlibrary.receiver.KeyReceiver;
@@ -96,13 +94,14 @@ public class MainActivity extends PluginActivity {
         file = null;
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVol, 0);
+        int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING); // 2019/1/21追記
+        audioManager.setStreamVolume(AudioManager.STREAM_RING, maxVol, 0); // 2019/1/21追記
 
         MediaPlayer mediaPlayer = new MediaPlayer();
         AudioAttributes attributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .setLegacyStreamType(AudioManager.STREAM_RING) // 2019/1/21追記
                 .build();
         try {
             mediaPlayer.setAudioAttributes(attributes);
@@ -138,6 +137,7 @@ public class MainActivity extends PluginActivity {
 
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(AudioSource.MIC);
+        mediaRecorder.setAudioSamplingRate(44100); // 2019/1/21追記
         mediaRecorder.setOutputFormat(OutputFormat.DEFAULT);
         mediaRecorder.setAudioEncoder(AudioEncoder.DEFAULT);
         mediaRecorder.setOutputFile(soundFilePath);
